@@ -28,7 +28,6 @@ let _ =
       Theory "tests/universo/theory/cts.dk";
       Import "tests/universo/theory";
       Output_directory "tests/universo/output";
-      Simplify "tests/universo/simplified_output";
     ];
   (* TODO: make this one passes *)
   (* Dedukti.Universo.run ~fails:true ~filename:"tests/universo/simple_ko.dk"
