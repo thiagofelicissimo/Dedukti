@@ -72,6 +72,4 @@ let cmd =
   let doc = "Dependency list generator for Dedukti files" in
   let exits = Term.default_exits in
   ( Term.(const dkdep $ Config.t $ ignore $ output $ sorted $ files),
-    Term.info "dkdep" ~version:"%%VERSION%%" ~doc ~exits )
-
-let () = Term.(exit @@ eval cmd)
+    Term.info "dep" ~doc ~exits )

@@ -114,6 +114,4 @@ let cmd =
   ( Term.(
       const dkcheck $ Config.t $ confluence $ de_bruijn $ export $ files $ eta
       $ ll $ sr_check $ errors_in_snf $ coc $ type_lhs),
-    Term.info "dkcheck" ~version:"%%VERSION%%" ~doc ~exits ~man )
-
-let () = Term.(exit @@ eval cmd)
+    Term.info "check" ~doc ~exits ~man )

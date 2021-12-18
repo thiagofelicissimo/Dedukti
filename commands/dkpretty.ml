@@ -25,6 +25,4 @@ let cmd =
   let exits = Term.default_exits in
   let man = [] in
   ( Term.(const beautify $ Config.t $ files),
-    Term.(info "dkpretty" ~version:"%%VERSION%%" ~doc ~exits ~man) )
-
-let () = Term.(exit @@ eval cmd)
+    Term.(info "beautify" ~doc ~exits ~man) )
