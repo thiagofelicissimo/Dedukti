@@ -54,6 +54,8 @@ struct
 
   and univ_conversion l r =
     let sg = Api.Env.get_signature (get !global_env).env in
+    (* THIAGO *)    
+    (*    Format.printf "check (%a) (%a)\n" T.pp_term l T.pp_term r;  *)
     if T.term_eq l r then true
     else if
       (* If two universes should be equal, then we add the constraint [l =?= r] AND a rule that
