@@ -21,6 +21,21 @@ let is_uvar t =
       String.length s > n && String.sub s 0 n = basename
   | _              -> false
 
+(** Check if a term is universe expression *)
+let rec is_uexp t =
+  match t with
+  | T.Const (_, n) ->
+      let s = B.string_of_ident (B.id n) in
+      let n = String.length basename in
+      String.length s > n && String.sub s 0 n = basename
+  | T.App (T.Const(_, name), a, args) ->
+     if B.string_of_mident (B.md name) = "cts"
+        && B.string_of_ident (B.id name) = "max" then
+       List.for_all (fun elem -> is_uexp elem) (a :: args)
+     else false
+  | _              -> false
+
+                    
 (** [name_of_uvar t] returns the name of universe variable if [t] is a universe variable, raise [Not_uvar] otherwise *)
 let name_of_uvar t =
   match t with T.Const (_, n) when is_uvar t -> n | _ -> raise Not_uvar

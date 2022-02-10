@@ -61,7 +61,14 @@ let mk_cstr env f cstr =
       if not (List.mem (B.md r) !deps) then deps := B.md r :: !deps;
       Format.fprintf fmt "%a@." print_eq_var (l, r);
       true
+  | U.EqLvlExp (l, r) ->
+     Format.printf "oi ";
+     Format.printf "%a\n" Api.Pp.Default.print_term l;
+     Format.printf "%a\n" Api.Pp.Default.print_term r;     
+     Format.fprintf fmt "[] %a --> %a." Api.Pp.Default.print_term l Api.Pp.Default.print_term r;
+     true
 
+     
 let get_deps () = !deps
 
 let flush () = deps := []

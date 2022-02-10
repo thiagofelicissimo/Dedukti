@@ -60,12 +60,17 @@ struct
     else if
       (* If two universes should be equal, then we add the constraint [l =?= r] AND a rule that
          makes [l] convertible to [r]. Order matters and is handled by the module U. *)
-      V.is_uvar l && V.is_uvar r
+      (*      V.is_uvar l && V.is_uvar r*)
+      V.is_uexp l && V.is_uexp r      
     then
       C.mk_cstr
         (of_global_env (get !global_env))
         add_rule
-        (U.EqVar (V.name_of_uvar l, V.name_of_uvar r))
+        (U.EqLvlExp (l, r))
+(*       C.mk_cstr
+        (of_global_env (get !global_env))
+        add_rule
+        (U.EqVar (V.name_of_uvar l, V.name_of_uvar r)) *)
     else if V.is_uvar l && U.is_enum r then (
       let r = U.extract_univ r in
       ignore

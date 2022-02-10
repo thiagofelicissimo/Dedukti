@@ -8,7 +8,7 @@ type pred =
   | Cumul of univ * univ
   | Rule of univ * univ * univ
 
-type cstr = Pred of pred | EqVar of B.name * B.name
+type cstr = Pred of pred | EqVar of B.name * B.name | EqLvlExp of T.term * T.term
 
 module C = Set.Make (struct
   type t = cstr
