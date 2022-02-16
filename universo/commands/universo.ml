@@ -10,6 +10,7 @@ module P = Parsers.Parser
 module S = Kernel.Signature
 module O = Common.Oracle
 module U = Common.Universes
+module N = Common.Unif
 
 (** Direct the control flow of Universo. The control flow of Universo can be sum up in 4 steps:
     1) Elaborate the files to replace universes by variables
@@ -314,8 +315,8 @@ let check : string -> unit =
   Api.Env.export universo_env.env;
   C.flush ();
   F.close universo_env.out_file;
-  Format.printf "OLA@.";
-  C.print_equations ()
+  N.solve_and_subst file
+  (*  C.print_equations ()*)
 (*  F.export in_path `Checking;
   F.export in_path `Solution;
   F.export in_path `Output*)

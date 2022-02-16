@@ -112,6 +112,18 @@ struct
           (of_global_env (get !global_env))
           add_rule
           (U.Pred (U.extract_pred r))
+    else if T.term_eq (U.true_ ()) r then
+      if U.is_subtype l then
+        let s = U.extract_subtype l in
+        are_convertible sg (U.true_ ()) s
+      else if U.is_forall l then
+        let s = U.extract_forall l in
+        are_convertible sg (U.true_ ()) s
+      else
+        C.mk_cstr
+          (of_global_env (get !global_env))
+          add_rule
+          (U.Pred (U.extract_pred l))
         (* Encoding of cumulativity uses the rule cast _ _ A A t --> t. Hence, sometimes [lift ss a =?= a]. This case is not capture by the cases above. This quite ugly to be so dependent of that rule, but I have found no nice solution to resolve that one. *)
     else if U.is_cast' l && not (U.is_cast' r) then
       let _, _, a, b, t = U.extract_cast' l in
