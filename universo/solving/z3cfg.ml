@@ -52,13 +52,13 @@ module Make (ZL : Z3LOGIC) = struct
   let add expr = Z3.Solver.add solver [expr]
 
   (** [mk_var s] construct a Z3 expression from the Z3 variable [s]. *)
-  let mk_var s =
+(*  let mk_var s =
     vars := SSet.add s !vars;
-    ZL.mk_var ctx s
+    ZL.mk_var ctx s*)
 
   let vars_of_univs univs =
     let f = function
-      | U.Var name -> vars := SSet.add (ZL.mk_name name) !vars
+      (*      | U.Var name -> vars := SSet.add (ZL.mk_name name) !vars*)
       | _          -> ()
     in
     List.iter f univs
@@ -92,13 +92,16 @@ module Make (ZL : Z3LOGIC) = struct
   let register_vars vars i =
     SSet.iter (fun var -> add (ZL.mk_bounds ctx var i)) vars
 
+exception Thiago
+    
   (** [mk_cstr c] construct the Z3 constraint from the universe constraint [c] *)
   let mk_cstr c =
     let open U in
     match c with
     | Pred p       -> mk_pred p
-    | EqVar (l, r) ->
-        Z.Boolean.mk_eq ctx (mk_var (ZL.mk_name l)) (mk_var (ZL.mk_name r))
+    | _ -> raise Thiago
+(*    | EqVar (l, r) ->
+        Z.Boolean.mk_eq ctx (mk_var (ZL.mk_name l)) (mk_var (ZL.mk_name r))*)
 
   (** [check theory_of i] solves the current constraints with at most [i] universes. If no solution is found, [check] is called recursively on [i+1]. *)
   let rec check env i =

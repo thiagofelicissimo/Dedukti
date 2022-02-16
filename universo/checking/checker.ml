@@ -55,7 +55,7 @@ struct
   and univ_conversion l r =
     let sg = Api.Env.get_signature (get !global_env).env in
     (* THIAGO *)    
-    (*    Format.printf "check (%a) (%a)\n" T.pp_term l T.pp_term r;  *)
+    (*    Format.printf "check (%a) (%a)\n" T.pp_term l T.pp_term r;*)
     if T.term_eq l r then true
     else if
       (* If two universes should be equal, then we add the constraint [l =?= r] AND a rule that
@@ -66,23 +66,29 @@ struct
       C.mk_cstr
         (of_global_env (get !global_env))
         add_rule
-        (U.EqLvlExp (l, r))
+        (U.EqLvlExp (C.term_to_uexp l, C.term_to_uexp r))
 (*       C.mk_cstr
         (of_global_env (get !global_env))
         add_rule
         (U.EqVar (V.name_of_uvar l, V.name_of_uvar r)) *)
-    else if V.is_uvar l && U.is_enum r then (
+(*    else if V.is_uvar l && U.is_enum r then (
+      Format.printf "l is %a\n" Api.Pp.Default.print_term l;
+      Format.printf "r is %a\n" Api.Pp.Default.print_term r;
+      Format.printf "test";
       let r = U.extract_univ r in
       ignore
         (C.mk_cstr
            (of_global_env (get !global_env))
            add_rule
-           (U.Pred (U.Cumul (Var (V.name_of_uvar l), r))));
+           (U.Pred (U.Cumul (LVar (V.name_of_uvar l), r))));
       C.mk_cstr
         (of_global_env (get !global_env))
         add_rule
-        (U.Pred (U.Cumul (r, Var (V.name_of_uvar l)))))
+        (U.Pred (U.Cumul (r, LVar (V.name_of_uvar l)))))
     else if V.is_uvar r && U.is_enum l then (
+      Format.printf "l is %a\n" Api.Pp.Default.print_term l;
+      Format.printf "r is %a\n" Api.Pp.Default.print_term r;
+      Format.printf "test";      
       let l = U.extract_univ l in
       ignore
         (C.mk_cstr
@@ -92,8 +98,8 @@ struct
       C.mk_cstr
         (of_global_env (get !global_env))
         add_rule
-        (U.Pred (U.Cumul (l, Var (V.name_of_uvar r))))
-      (* The witness of a universe constraint is always I. It's type should should be convertible to true. Knowing Dedukti behavior, the expected type is the left one (true) and the right one is the predicate to satisfy *))
+        (U.Pred (U.Cumul (l, Var (V.name_of_uvar r))))) *)
+      (* The witness of a universe constraint is always I. It's type should should be convertible to true. Knowing Dedukti behavior, the expected type is the left one (true) and the right one is the predicate to satisfy *)
     else if T.term_eq (U.true_ ()) l then
       if U.is_subtype r then
         let s = U.extract_subtype r in
@@ -162,7 +168,7 @@ let check_user_constraints :
     let pred = Hashtbl.find constraints name in
     let uvar = get_uvar ty in
     let replace_univ : U.univ -> U.univ = function
-      | Var _  -> Var uvar
+      | LVar _  -> LVar (B.string_of_ident (B.id uvar))
       | _ as t -> t
     in
     let replace : U.pred -> U.pred = function

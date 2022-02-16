@@ -314,9 +314,11 @@ let check : string -> unit =
   Api.Env.export universo_env.env;
   C.flush ();
   F.close universo_env.out_file;
-  F.export in_path `Checking;
+  Format.printf "OLA@.";
+  C.print_equations ()
+(*  F.export in_path `Checking;
   F.export in_path `Solution;
-  F.export in_path `Output
+  F.export in_path `Output*)
 
 (** [solve files] call a SMT solver on the constraints generated for all the files [files].
     ASSUME that [file_cstr] and [file_univ] have been generated for all [file] in [files]. *)

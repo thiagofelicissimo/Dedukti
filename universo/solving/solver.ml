@@ -14,15 +14,19 @@ open Utils
 
 (** [from_rule pat rhs] add the assertion [pat = rhs]. *)
 let from_rule : R.pattern -> T.term -> U.cstr =
- fun pat right ->
+ fun pat _ ->
   let left = R.pattern_to_term pat in
   try (* the constraint is a predicate *)
       U.Pred (U.extract_pred left)
   with U.Not_pred ->
     (* the constraint is en equality between variables *)
-    let left' = Elaboration.Var.name_of_uvar left in
+
+(*    let left' = Elaboration.Var.name_of_uvar left in
     let right' = Elaboration.Var.name_of_uvar right in
-    U.EqVar (left', right')
+    U.EqVar (left', right')*)
+
+(* Thiago: changed just so it typechecks *)
+    U.EqLvlExp (U.LZero, U.LZero)
 
 module Make (Solver : SMTSOLVER) : SOLVER = struct
   (** [parse meta s] parses a constraint file. *)
@@ -97,7 +101,7 @@ module MakeUF (Solver : SMTSOLVER) : SOLVER = struct
   let mk_rule : R.partially_typed_rule -> unit =
    fun r ->
     match from_rule r.pat r.rhs with
-    | U.EqVar _ -> rules := r :: !rules
+    | U.EqLvlExp _ -> rules := r :: !rules
     | U.Pred p  -> sp := SP.add p !sp
 
   (** [parse meta s] parses a constraint file. *)

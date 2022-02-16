@@ -24,15 +24,16 @@ let is_uvar t =
 (** Check if a term is universe expression *)
 let rec is_uexp t =
   match t with
+  | T.Const(_,n) when B.name_eq n (U.ctszero ())->
+     true
+  | T.App (T.Const(_,n), t1, []) when B.name_eq n (U.ctssucc ())->
+     is_uexp t1
+  | T.App (T.Const(_,n), t1, [t2]) when B.name_eq n (U.ctsmax ())->
+     is_uexp t1 && is_uexp t2
   | T.Const (_, n) ->
-      let s = B.string_of_ident (B.id n) in
-      let n = String.length basename in
-      String.length s > n && String.sub s 0 n = basename
-  | T.App (T.Const(_, name), a, args) ->
-     if B.string_of_mident (B.md name) = "cts"
-        && B.string_of_ident (B.id name) = "max" then
-       List.for_all (fun elem -> is_uexp elem) (a :: args)
-     else false
+     let s = B.string_of_ident (B.id n) in
+     let n = String.length basename in
+     String.length s > n && String.sub s 0 n = basename
   | _              -> false
 
                     

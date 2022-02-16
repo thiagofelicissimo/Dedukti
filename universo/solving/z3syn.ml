@@ -26,9 +26,9 @@ let mk_sinf ctx = Z.Expr.mk_const_s ctx "Sinf" (sort ctx)
 
 (** [mk_univ ctx u] construct a Z3 expression from a universe. *)
 let mk_univ ctx = function
-  | U.Sinf   -> mk_sinf ctx
-  | U.Var x  -> mk_var ctx (mk_name x)
-  | U.Enum i -> mk_enum ctx i
+  | _  -> mk_var ctx "ola"
+(*  | U.Sinf   -> mk_sinf ctx              
+  | U.Enum i -> mk_enum ctx i*)
 
 let bool_sort ctx = Z.Boolean.mk_sort ctx
 

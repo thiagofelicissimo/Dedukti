@@ -27,9 +27,9 @@ module Make (Spec : L.LRA_SPECIFICATION) = struct
   let mk_univ : ctx -> U.univ -> t =
    fun ctx u ->
     match u with
-    | Sinf     -> to_int ctx (-1)
-    | Var name -> mk_var ctx (mk_name name)
-    | Enum n   -> to_int ctx n
+    (*    | Sinf     -> to_int ctx (-1)
+    | Var name -> mk_var ctx (mk_name name) *)
+    | _   -> to_int ctx 0
 
   let mk_max : ctx -> t -> t -> t =
    fun ctx l r -> ZB.mk_ite ctx (ZA.mk_le ctx l r) r l
@@ -77,8 +77,8 @@ module Make (Spec : L.LRA_SPECIFICATION) = struct
         Format.eprintf "%s@." var;
         assert false
     | Some e ->
-        let v = Z.to_int (ZI.get_big_int e) in
-        U.Enum v
+        let _ = Z.to_int (ZI.get_big_int e) in
+        U.LZero
 
   let mk_theory = false
 end

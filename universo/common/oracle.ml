@@ -6,9 +6,15 @@ type theory = (U.pred * bool) list
 
 type theory_maker = int -> theory
 
-let rec enumerate : int -> U.univ list =
- fun i -> if i = 0 then [] else U.Enum (i - 1) :: enumerate (i - 1)
+(*let rec enumerate : int -> U.univ list =
+ fun i -> if i = 0 then [] else U.Enum (i - 1) :: enumerate (i - 1)*)
 
+
+(* Thiago: leaving this just so the rest typechecks *)
+let enumerate : int -> U.univ list =
+ fun _ -> []
+
+                  
 (** [is_true meta p] check if the predicate [p] is true in the original theory. *)
 let is_true (meta : M.cfg) p =
   let t = U.term_of_pred p in

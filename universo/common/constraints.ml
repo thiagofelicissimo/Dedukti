@@ -6,6 +6,9 @@ module T = Kernel.Term
 module U = Universes
 module M = Api.Meta
 
+
+let equations : (U.univ * U.univ) list ref = ref []         
+         
 type t = {file : F.cout F.t; meta : M.cfg}
 
 type print_cstrs = {
@@ -46,29 +49,85 @@ let mk_var_cstr f l r =
   else if nr < nl then (f l r; (l, r))
   else (f r l; (r, l))
 
-let deps = ref []
+let deps : B.mident list ref  = ref []
 
-let mk_cstr env f cstr =
+exception NotAnUexpTerm
+         
+let rec uexp_term_to_pattern t =
+  match t with
+  | T.Const (_, n) ->
+     R.Pattern (B.dloc, n, [])
+  | T.App (T.Const(_,n), t1, [t2]) when B.name_eq n (U.ctsmax ())->
+     let l1 = uexp_term_to_pattern t1 in
+     let l2 = uexp_term_to_pattern t2 in     
+     R.Pattern (B.dloc, U.ctsmax (), [l1; l2])
+  | _              -> raise NotAnUexpTerm
+
+
+(*let print_uexp l = Api.Pp.Default.print_term (U.term_of_univ l)*)
+
+let print_uexp fmt e =
+  let t = U.term_of_univ e in
+  Format.fprintf fmt "%a" Api.Pp.Default.print_term t
+
+let print_equations () =
+  List.fold_left
+    (fun _ (l,r) ->
+      Format.printf "%a = %a@." print_uexp l print_uexp r)
+    (Format.printf "constraints: @.") !equations
+
+exception FoundCumul
+     
+let add_pred_cstr p =
+  let eq p = 
+  match p with
+  | U.Axiom (u1, u2) -> U.LSucc u1, u2
+  | U.Rule (u1, u2, u3) -> U.LMax (u1, u2), u3
+  | _ -> raise FoundCumul
+  in equations := (eq p) :: (!equations)
+
+  
+let mk_cstr env _ cstr =
   let fmt = F.fmt_of_file env.file in
   match cstr with
   | U.Pred p       ->
-      Format.fprintf fmt "%a@." print_predicate p;
-      true
-  | U.EqVar (l, r) ->
+     Format.fprintf fmt "%a@." print_predicate p;
+     add_pred_cstr p;
+     (*     Format.printf "%a@." print_predicate p;     *)
+     true
+(*  | U.EqVar (l, r) ->
       let l, r = mk_var_cstr f l r in
       (* FIXME: explain the rationale. *)
       Api.Meta.add_rules env.meta [mk_rule l r];
       if not (List.mem (B.md r) !deps) then deps := B.md r :: !deps;
-      Format.fprintf fmt "%a@." print_eq_var (l, r);
-      true
+      Format.fprintf fmt "%a@.\n" print_eq_var (l, r);
+      Format.printf "%a@.\n" print_eq_var (l, r);            
+      true*)
   | U.EqLvlExp (l, r) ->
-     Format.printf "oi ";
-     Format.printf "%a\n" Api.Pp.Default.print_term l;
-     Format.printf "%a\n" Api.Pp.Default.print_term r;     
-     Format.fprintf fmt "[] %a --> %a." Api.Pp.Default.print_term l Api.Pp.Default.print_term r;
+     equations := (l, r) :: !equations;
+     (*     let print_uexp l = Api.Pp.Default.print_term (U.term_of_univ l) in     *)
+     let l' = U.term_of_univ l in
+     let r' = U.term_of_univ r in     
+     Format.fprintf fmt "[] %a --> %a.@." Api.Pp.Default.print_term l' Api.Pp.Default.print_term r';
+     (*     Format.printf "[] %a --> %a.@." Api.Pp.Default.print_term l Api.Pp.Default.print_term r;*)
+     (*     Api.Meta.add_rules env.meta [R.{ctx = []; pat = uexp_term_to_pattern l; rhs = r; name = dummy_name}];*)
      true
 
-     
+let rec term_to_uexp t =
+  match t with
+  | T.Const(_,n) when B.name_eq n (U.ctszero ())->
+     U.LZero
+  | T.App (T.Const(_,n), t1, []) when B.name_eq n (U.ctssucc ())->
+     U.LSucc (term_to_uexp t1)
+  | T.App (T.Const(_,n), t1, [t2]) when B.name_eq n (U.ctsmax ())->
+     U.LMax (term_to_uexp t1, term_to_uexp t2)
+  | T.Const (_, n) ->
+     let s = B.string_of_ident (B.id n) in
+     U.LVar s
+  | _              -> raise NotAnUexpTerm
+
+
+       
 let get_deps () = !deps
 
 let flush () = deps := []
