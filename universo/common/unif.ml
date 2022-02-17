@@ -235,10 +235,17 @@ let extract_name filename =
 
 let extra_cstr name =
   match name with
+  | "True" | "False" -> C.equations := (U.LVar "?1", U.LZero) :: (!C.equations)
+  | "Or" | "And" ->
+     C.equations := (U.LVar "?4", U.LZero) ::
+                      (U.LVar "?9", U.LZero) ::
+                        (U.LVar "?11", U.LZero) :: (!C.equations)
   | "nat" -> C.equations := (U.LVar "?0", U.LSucc U.LZero) :: (!C.equations)
+  | "match_And_prop" -> C.equations := (U.LVar "?23", U.LVar "?22") :: (!C.equations)
+  | "match_Or_prop" -> C.equations := (U.LVar "?25", U.LVar "?20") :: (!C.equations)             
   | "le" -> C.equations := (U.LVar "?7", U.LZero) :: (!C.equations)           
   | "eq" -> C.equations := (U.LVar "?6", U.LVar "?12") :: (!C.equations)
-  | "Not" -> C.equations := (U.LVar "?6", U.LVar "?4") :: (!C.equations)          
+  | "Not" -> C.equations := (U.LVar "?4", U.LZero) :: (U.LVar "?6", U.LVar "?4") :: (!C.equations) 
   | "equal" -> C.equations := (U.LVar "?6", U.LVar "?12") :: (!C.equations)          
   | "bool" -> C.equations := (U.LVar "?0", U.LSucc U.LZero) :: (!C.equations)
   (*  | "bool_discr" -> C.equations := (U.LVar "?11", U.LSucc (U.LSucc U.LZero)) :: (!C.equations)*)
